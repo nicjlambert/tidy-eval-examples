@@ -23,11 +23,11 @@ grouped_mean1(mtcars, mpg, cyl)
 # option 2 ----------------------------------------------------------------
 
 
-grouped_mean2 <- function(data, group_var, summarise_var) {
+grouped_mean2 <- function(data, .group_var, .summarise_var) {
   data %>%
-    group_by(across({{ group_var }})) %>% 
-    #summarise("mean_{{summarise_var}}" := mean({{ summarise_var }})) %>% 
-    summarise(across({{ summarise_var }}, mean, .names = "mean_{.col}"))
+    group_by(across({{ .group_var }})) %>% 
+    #summarise("mean_{{ .summarise_var}}" := mean({{ .summarise_var }})) %>% 
+    summarise(across({{ .summarise_var }}, mean, .names = "mean_{.col}"))
 }
 
 grouped_mean2(mtcars, cyl, mpg)
