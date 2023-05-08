@@ -1,57 +1,56 @@
-#see https://dplyr.tidyverse.org/articles/programming.html
-
-#install.packages('tidyverse')
+# Load the tidyverse library
 library(tidyverse)
 
+# Load the built-in mtcars dataset
 data(mtcars)
 
+# OPTION 1 --------------------------------------------------------------
 
-# option 1 ----------------------------------------------------------------
-
+# Define a function called 'grouped_mean1' that calculates the mean of a specified variable for each group
 grouped_mean1 <- function(.data, .summary_var, ...) {
+  # Capture the summary variable and group variables as quosures
   .summary_var <- enquo(.summary_var)
   .group_vars <- enquos(...)
   
+  # Perform the group_by and summarise operations using the quosures
   .data %>%
     group_by(!!!.group_vars) %>%
     summarise(mean = mean(!!.summary_var))
 }
 
+# Call the 'grouped_mean1' function with the mtcars dataset, specifying 'mpg' as the summary variable and 'cyl' as the group variable
 grouped_mean1(mtcars, mpg, cyl)
 
+# OPTION 2 --------------------------------------------------------------
 
-# option 2 ----------------------------------------------------------------
-
-
+# Define a function called 'grouped_mean2' that calculates the mean of a specified variable for each group
 grouped_mean2 <- function(data, .group_var, .summarise_var) {
   data %>%
+    # Group the data by the specified group variable
     group_by(across({{ .group_var }})) %>% 
-    #summarise("mean_{{ .summarise_var}}" := mean({{ .summarise_var }})) %>% 
+    # Calculate the mean of the specified summary variable for each group
     summarise(across({{ .summarise_var }}, mean, .names = "mean_{.col}"))
 }
 
+# Call the 'grouped_mean2' function with the mtcars dataset, specifying 'cyl' as the group variable and 'mpg' as the summary variable
 grouped_mean2(mtcars, cyl, mpg)
 
-# When you have an env-variable that is a character vector, you need to index into the .data pronoun with [[, like
+# PRINT COUNTS FOR EACH UNIQUE VALUE ------------------------------------
 
-# Note that .data is not a data frame; it’s a special construct, a pronoun, that 
-# allows you to access the current variables either directly, with .data$x or 
-# indirectly with .data[[var]]. Don’t expect other functions to work with it.
-
+# Loop through each variable in the mtcars dataset
 for (var in names(mtcars)) {
+  # Count the number of occurrences of each unique value of the variable and print the result
   mtcars %>% count(.data[[var]]) %>% print()
-
 }
 
-# If you want to take an arbitrary number of user supplied expressions, use '...' 
-# This is often useful when you want to give the user full control over a 
-# single part of the pipeline, like a group_by() or a mutate().
+# CUSTOM SUMMARISE FUNCTION ---------------------------------------------
 
-
+# Define a function called 'my_summarise' that groups the data by user-specified expressions and calculates the mean of 'mpg' and 'cyl' for each group
 my_summarise <- function(.data, ...) {
   .data %>%
     group_by(...) %>%
     summarise(mpg = mean(mpg, na.rm = TRUE), cyl = mean(cyl, na.rm = TRUE))
 }
 
+# Call the 'my_summarise' function with the mtcars dataset, specifying 'gear' as the grouping variable
 mtcars %>% my_summarise(gear)
