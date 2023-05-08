@@ -1,0 +1,11 @@
+{
+    "name": "R Codespace",
+    "dockerFile": "Dockerfile",
+    "extensions": [
+      "ikuyadeu.r" // Add the R extension for Visual Studio Code
+    ],
+    "settings": {
+      "terminal.integrated.defaultProfile.linux": "/bin/bash"
+    }
+  }
+  
